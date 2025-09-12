@@ -19,7 +19,6 @@ class CustomUserManager(BaseUserManager):
             **extra_fields: Дополнительные поля модели (например, phone, city и т.д.).
         Returns:
             User: Экземпляр созданного пользователя.
-
         Raises:
             ValueError: Если email не указан.
         """
@@ -56,9 +55,8 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
-    Кастомная модель пользователя Django, использующая email вместо username для аутентификации.
+    Модель пользователя, использующая email вместо username для аутентификации.
     Добавляет дополнительные поля: телефон, город и аватарка.
-    Поддерживает стандартную систему разрешений Django (PermissionsMixin).
     """
 
     email = models.EmailField(

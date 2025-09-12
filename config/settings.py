@@ -31,8 +31,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    # 'education',
-    # 'users',
+    'education',
+    'users',
 
 ]
 
