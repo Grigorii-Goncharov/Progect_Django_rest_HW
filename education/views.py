@@ -18,6 +18,7 @@ class CourseViewSet(viewsets.ViewSet):
     Использует CourseSerializer для сериализации/десериализации данных.
     Все ответы возвращаются в формате JSON с корректными HTTP-статусами.
     """
+
     def list(self, request):
         """
         Возвращает список всех курсов.

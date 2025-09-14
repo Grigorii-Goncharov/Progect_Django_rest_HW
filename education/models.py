@@ -11,18 +11,18 @@ class Course(models.Model):
     title = models.CharField(
         max_length=200,
         verbose_name="Название",
-        help_text="Краткое название курса (до 200 символов)."
+        help_text="Краткое название курса (до 200 символов).",
     )
     description = models.TextField(
         verbose_name="Описание",
-        help_text="Подробное описание содержания и целей курса."
+        help_text="Подробное описание содержания и целей курса.",
     )
     preview = models.ImageField(
-        upload_to='course_previews/',
+        upload_to="course_previews/",
         verbose_name="Превью",
         blank=True,
         null=True,
-        help_text="Изображение-превью для отображения в списке курсов. Поддерживаются JPG, PNG."
+        help_text="Изображение-превью для отображения в списке курсов. Поддерживаются JPG, PNG.",
     )
 
     class Meta:
@@ -48,35 +48,35 @@ class Lesson(models.Model):
     title = models.CharField(
         max_length=200,
         verbose_name="Название",
-        help_text="Краткое название урока (до 200 символов)."
+        help_text="Краткое название урока (до 200 символов).",
     )
     description = models.TextField(
         verbose_name="Описание",
-        help_text="Краткое описание содержания урока, задачи или темы."
+        help_text="Краткое описание содержания урока, задачи или темы.",
     )
     preview = models.ImageField(
-        upload_to='lesson_previews/',
+        upload_to="lesson_previews/",
         verbose_name="Превью",
         blank=True,
         null=True,
-        help_text="Изображение-превью для урока. Отображается в списке уроков."
+        help_text="Изображение-превью для урока. Отображается в списке уроков.",
     )
     video_url = models.URLField(
         verbose_name="Ссылка на видео",
-        help_text="Полный URL на видео (YouTube, Vimeo, или другой хостинг)."
+        help_text="Полный URL на видео (YouTube, Vimeo, или другой хостинг).",
     )
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
-        related_name='lessons',
+        related_name="lessons",
         verbose_name="Курс",
-        help_text="Курс, к которому относится этот урок. При удалении курса — уроки удаляются."
+        help_text="Курс, к которому относится этот урок. При удалении курса — уроки удаляются.",
     )
 
     class Meta:
         verbose_name = "Урок"
         verbose_name_plural = "Уроки"
-        ordering = ['id']  # Уроки автоматически сортируются по порядку создания
+        ordering = ["id"]  # Уроки автоматически сортируются по порядку создания
 
     def __str__(self):
         """
