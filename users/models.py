@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.core.validators import RegexValidator
 
 
@@ -53,7 +53,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractBaseUser):
+class User(AbstractUser):
     """
     Модель пользователя, использующая email вместо username для аутентификации.
     Добавляет дополнительные поля: телефон, город и аватарка.
@@ -125,3 +125,9 @@ class User(AbstractBaseUser):
             str: Email пользователя.
         """
         return self.email
+
+    # def save(self, *args, **kwargs):
+    #     if not self.username:
+    #         self.username = self.email
+    #     super().save(*args, **kwargs)
+
