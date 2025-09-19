@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from education.models import Course, Lesson
-from education.serializers import CourseSerializer, LessonSerializer
+from education.serializers import CourseSerializer, LessonSerializer, CourseSerializerList
 from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 
@@ -43,13 +43,15 @@ class CourseViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         """
-        Возвращает один курс по его ID.
+        Возвращает детальную информацию о курсе по его уникальному идентификатору.
         Метод: GET /courses/{id}/
         Аргументы:
             pk (str): Уникальный идентификатор курса (первичный ключ).
+        Возвращает:
+            Response: Сериализованные данные курса с использованием CourseSerializerList.
         """
         course = get_object_or_404(Course.objects.all(), pk=pk)
-        serializer = CourseSerializer(course)
+        serializer = CourseSerializerList(course)  # или CourseSerializer, если нужен детальный
         return Response(serializer.data)
 
     def update(self, request, pk=None):
