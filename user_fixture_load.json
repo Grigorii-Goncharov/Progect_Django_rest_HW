@@ -1,0 +1,121 @@
+[
+    {
+        "model": "users.user",
+        "fields": {
+            "password":"qwerty123",
+            "is_superuser":"False",
+            "username":"user1",
+            "first_name":"user1",
+            "last_name":"user1",
+            "email": "test1@yandex.ru",
+            "phone": "+79270604550",
+            "city":"Москва",
+            "avatar":"user_avatars/001.jpg",
+            "is_active":"True",
+            "is_staff":"False",
+            "date_joined":"2023-03-01T10:30:00Z"
+        }
+    },
+    {
+        "model": "users.user",
+        "fields": {
+            "password":"qwerty123",
+            "is_superuser":"False",
+            "username":"user2",
+            "first_name":"user2",
+            "last_name":"user2",
+            "email": "test2@yandex.ru",
+            "phone": "+79270604551",
+            "city": "Питер",
+            "avatar": "user_avatars/002.jpg",
+            "is_active": "True",
+            "is_staff": "False",
+            "date_joined": "2023-04-05T13:30:00Z"
+        }
+    },
+    {
+        "model": "users.user",
+        "fields": {
+            "password":"qwerty123",
+            "is_superuser":"False",
+            "username":"user3",
+            "first_name":"user3",
+            "last_name":"user3",
+            "email": "test3@yandex.ru",
+            "phone": "+79270604552",
+            "city": "Волгоград",
+            "avatar": "user_avatars/003.jpg",
+            "is_active": "True",
+            "is_staff": "False",
+            "date_joined": "2024-07-05T14:30:00Z"
+        }
+    },
+    {
+        "model": "users.user",
+        "fields": {
+            "password":"qwerty123",
+            "is_superuser":"False",
+            "username":"user4",
+            "first_name":"user4",
+            "last_name":"user4",
+            "email": "test4@yandex.ru",
+            "phone": "+79270604553",
+            "city": "Пенза",
+            "avatar": "user_avatars/004.jpg",
+            "is_active": "True",
+            "is_staff": "False",
+            "date_joined": "2025-02-18T20:30:00Z"
+        }
+    },
+    {
+        "model": "users.user",
+        "fields": {
+            "password":"qwerty123",
+            "is_superuser":"False",
+            "username":"user5",
+            "first_name":"user5",
+            "last_name":"user5",
+            "email": "test5@yandex.ru",
+            "phone": "+79270604554",
+            "city": "Саратов",
+            "avatar": "user_avatars/005.jpg",
+            "is_active": "True",
+            "is_staff": "False",
+            "date_joined": "2025-05-03T09:30:00Z"
+        }
+    },
+    {
+        "model": "users.user",
+        "fields": {
+            "password":"qwerty123",
+            "is_superuser":"False",
+            "username":"user6",
+            "first_name":"user6",
+            "last_name":"user6",
+            "email": "test6@yandex.ru",
+            "phone": "+79270604555",
+            "city": "Ростов-на-Дону",
+            "avatar": "user_avatars/006.jpg",
+            "is_active": "True",
+            "is_staff": "False",
+            "date_joined": "2025-06-05T14:30:00Z"
+        }
+    },
+        {
+        "model": "users.user",
+        "fields": {
+            "password":"qwerty123",
+            "is_superuser":"False",
+            "username":"user7",
+            "first_name":"user7",
+            "last_name":"user7",
+            "email": "test7@yandex.ru",
+            "phone": "+79270604556",
+            "city": "Ростов-на-Дону",
+            "avatar": "user_avatars/007.jpg",
+            "is_active": "True",
+            "is_staff": "False",
+            "date_joined": "2024-08-10T16:30:00Z"
+        }
+    }
+]

@@ -1,0 +1,79 @@
+[
+    {
+        "model": "users.payment",
+        "fields": {
+            "payment_date":"2023-03-01T10:30:00Z",
+            "amount": 100,
+            "payment_method":"cash",
+            "course":"1",
+            "lesson":null,
+            "user": "1"
+        }
+    },
+    {
+        "model": "users.payment",
+        "fields": {
+            "payment_date":"2023-03-01T10:30:00Z",
+            "amount": 100,
+            "payment_method":"cash",
+            "course":"2",
+            "lesson":null,
+            "user": "2"
+        }
+    },
+        {
+        "model": "users.payment",
+        "fields": {
+            "payment_date":"2023-03-01T10:30:00Z",
+            "amount": 10,
+            "payment_method":"cash",
+            "course":null,
+            "lesson":"2",
+            "user": "3"
+        }
+    },
+    {
+        "model": "users.payment",
+        "fields": {
+            "payment_date":"2023-03-01T10:30:00Z",
+            "amount": 10,
+            "payment_method":"cash",
+            "course":null,
+            "lesson":"3",
+            "user": "3"
+        }
+    },
+    {
+        "model": "users.payment",
+        "fields": {
+            "payment_date":"2023-03-01T10:30:00Z",
+            "amount": 100,
+            "payment_method":"cash",
+            "course":null,
+            "lesson":"2",
+            "user": "4"
+        }
+    },
+     {
+        "model": "users.payment",
+        "fields": {
+            "payment_date":"2023-03-01T10:30:00Z",
+            "amount": 100,
+            "payment_method":"cash",
+            "course":"4",
+            "lesson":null,
+            "user": "5"
+        }
+    },
+    {
+        "model": "users.payment",
+        "fields": {
+            "payment_date":"2023-03-01T10:30:00Z",
+            "amount": 80,
+            "payment_method":"cash",
+            "course":"3",
+            "lesson":null,
+            "user": "6"
+        }
+    }
+]
