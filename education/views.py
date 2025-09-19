@@ -1,6 +1,10 @@
 from django.shortcuts import get_object_or_404
 from education.models import Course, Lesson
-from education.serializers import CourseSerializer, LessonSerializer, CourseSerializerList
+from education.serializers import (
+    CourseSerializer,
+    LessonSerializer,
+    CourseSerializerList,
+)
 from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 
@@ -51,7 +55,9 @@ class CourseViewSet(viewsets.ViewSet):
             Response: Сериализованные данные курса с использованием CourseSerializerList.
         """
         course = get_object_or_404(Course.objects.all(), pk=pk)
-        serializer = CourseSerializerList(course)  # или CourseSerializer, если нужен детальный
+        serializer = CourseSerializerList(
+            course
+        )  # или CourseSerializer, если нужен детальный
         return Response(serializer.data)
 
     def update(self, request, pk=None):

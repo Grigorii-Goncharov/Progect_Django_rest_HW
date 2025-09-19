@@ -3,6 +3,7 @@ from rest_framework.serializers import ModelSerializer
 
 from education.models import Course, Lesson
 
+
 class LessonSerializer(ModelSerializer):
     class Meta:
         model = Lesson
@@ -18,7 +19,9 @@ class CourseSerializer(ModelSerializer):
 
 class CourseSerializerList(ModelSerializer):
     count_lessons = SerializerMethodField()
-    lessons= LessonSerializer(many= True, read_only=True)# many = уроков может быть несколько(берем сериализатор урока)
+    lessons = LessonSerializer(
+        many=True, read_only=True
+    )  # many = уроков может быть несколько(берем сериализатор урока)
 
     def get_count_lessons(self, subj):
         return subj.lessons.count()
@@ -26,14 +29,10 @@ class CourseSerializerList(ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id',
-            'title',
-            'description',
-            'preview',
-            'count_lessons',
-            'lessons',
+            "id",
+            "title",
+            "description",
+            "preview",
+            "count_lessons",
+            "lessons",
         ]
-
-
-
-
