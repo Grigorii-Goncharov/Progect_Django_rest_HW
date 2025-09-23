@@ -1,7 +1,8 @@
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
-from rest_framework.generics import CreateAPIView
+from rest_framework import viewsets, generics
+from rest_framework.generics import CreateAPIView, DestroyAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from users.models import Payment, User
 from users.serializers import PaymentSerializer, UserSerializer
@@ -41,5 +42,28 @@ class UserCreateAPIview(CreateAPIView):
         user = serializer.save(is_active=True)
         user.set_password(user.password)
         user.save()
+
+
+
+class UserListAPIView(generics.ListAPIView):  # ← ИСПРАВЛЕНО: ListAPIView!
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+
+
+class UserProfileAPIView(RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]  # Только авторизованные
+
+    def get_object(self):
+        return self.request.user  # Всегда возвращает текущего пользователя
+
+
+class UserDeleteAPIView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
 
 
