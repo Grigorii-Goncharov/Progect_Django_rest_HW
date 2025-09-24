@@ -120,6 +120,11 @@ class LessonCreateList(generics.ListCreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
 
+    def perform_create(self, serializer):
+        lesson = serializer.save()
+
+
+
 
 class LessonRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     """
