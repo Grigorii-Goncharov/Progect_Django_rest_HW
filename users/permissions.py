@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+
 class IsOwnerOrModerator(permissions.BasePermission):
     """Разрешает доступ следующим образом:
     - Администраторы (is_staff): полный доступ ко всем операциям.
@@ -15,9 +16,12 @@ class IsOwnerOrModerator(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        if request.method == 'POST':
-            return request.user.is_authenticated and not request.user.groups.filter(name='Moderator').exists()
-        if request.method in ['GET']:
+        if request.method == "POST":
+            return (
+                request.user.is_authenticated
+                and not request.user.groups.filter(name="Moderator").exists()
+            )
+        if request.method in ["GET"]:
             return request.user.is_authenticated
         return True  # PUT/PATCH/DELETE — проверяются в has_object_permission
 
@@ -26,7 +30,6 @@ class IsOwnerOrModerator(permissions.BasePermission):
             return True
         if obj.owner == request.user:
             return True
-        if request.user.groups.filter(name='Moderator').exists():
-            return request.method in ['GET', 'PUT', 'PATCH']  # DELETE — запрещён!
+        if request.user.groups.filter(name="Moderator").exists():
+            return request.method in ["GET", "PUT", "PATCH"]  # DELETE — запрещён!
         return False
-

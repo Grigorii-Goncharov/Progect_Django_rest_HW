@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 
 from config import settings
+
 # from education.models import Course, Lesson
 
 

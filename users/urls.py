@@ -1,5 +1,11 @@
 from .apps import UsersConfig
-from .views import PaymentViewSet, UserCreateAPIview, UserListAPIView, UserProfileAPIView, UserDeleteAPIView
+from .views import (
+    PaymentViewSet,
+    UserCreateAPIview,
+    UserListAPIView,
+    UserProfileAPIView,
+    UserDeleteAPIView,
+)
 from rest_framework.routers import DefaultRouter
 from django.urls import path
 from rest_framework_simplejwt.views import (
@@ -13,16 +19,11 @@ router = DefaultRouter()
 router.register(r"payment", PaymentViewSet, basename="payment")
 
 urlpatterns = [
-    path('register/', UserCreateAPIview.as_view(), name='register'),
-    path('login/', TokenObtainPairView.as_view(), name='login'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-    path('list/', UserListAPIView.as_view(), name='user-list'),
-    path('profile/', UserProfileAPIView.as_view(), name='user-profile'),
-    path('profile/delete/', UserDeleteAPIView.as_view(), name='user-delete'),
+    path("register/", UserCreateAPIview.as_view(), name="register"),
+    path("login/", TokenObtainPairView.as_view(), name="login"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("list/", UserListAPIView.as_view(), name="user-list"),
+    path("profile/", UserProfileAPIView.as_view(), name="user-profile"),
+    path("profile/delete/", UserDeleteAPIView.as_view(), name="user-delete"),
 ]
 urlpatterns += router.urls
-
-
-
-

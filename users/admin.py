@@ -2,12 +2,13 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from users.models import User
 
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'phone', 'groups_list')  # <-- добавляем наше поле
-    search_fields = ('email', 'phone')
+    list_display = ("email", "phone", "groups_list")  # <-- добавляем наше поле
+    search_fields = ("email", "phone")
 
-    @admin.display(description='Группы')# отображение поля группы
+    @admin.display(description="Группы")  # отображение поля группы
     def groups_list(self, obj):
         if obj.groups.exists():
             return ", ".join(group.name for group in obj.groups.all())

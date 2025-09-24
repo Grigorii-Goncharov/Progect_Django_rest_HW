@@ -44,7 +44,6 @@ class UserCreateAPIview(CreateAPIView):
         user.save()
 
 
-
 class UserListAPIView(generics.ListAPIView):  # ← ИСПРАВЛЕНО: ListAPIView!
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -64,6 +63,3 @@ class UserDeleteAPIView(DestroyAPIView):
 
     def get_object(self):
         return self.request.user
-
-
-

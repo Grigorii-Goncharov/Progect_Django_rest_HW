@@ -13,6 +13,7 @@ class LessonSerializer(ModelSerializer):
         Meta.model (Lesson): Модель, с которой работает сериализатор.
         Meta.fields (str): "__all__" — включает все поля модели.
     """
+
     class Meta:
         model = Lesson
         fields = "__all__"
