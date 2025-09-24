@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 
 class Course(models.Model):
     """
@@ -23,6 +25,16 @@ class Course(models.Model):
         blank=True,
         null=True,
         help_text="Изображение-превью для отображения в списке курсов. Поддерживаются JPG, PNG.",
+    )
+
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="owner_course",
+        verbose_name="Владелец",
+        blank=True,
+        null=True,
+        help_text="Владелец, к которому относится этот курс. При удалении круса — курсы удаляются.",
     )
 
     class Meta:
@@ -70,7 +82,17 @@ class Lesson(models.Model):
         on_delete=models.CASCADE,
         related_name="lessons",
         verbose_name="Курс",
-        help_text="Курс, к которому относится этот урок. При удалении курса — уроки удаляются.",
+        help_text="Курс, к которому относится этот урок. При удалении урока — уроки удаляются.",
+    )
+
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="owner_lesson",
+        verbose_name="Владелец",
+        blank=True,
+        null=True,
+        help_text="Владелец, к которому относится этот урок. При удалении урока — уроки удаляются.",
     )
 
     class Meta:
