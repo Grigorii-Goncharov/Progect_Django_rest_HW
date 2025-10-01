@@ -66,7 +66,7 @@ class LessonCreateList(generics.ListCreateAPIView):
 
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsOwnerOrModerator]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         """Автоматически назначает текущего пользователя владельцем создаваемого урока."""
@@ -95,7 +95,7 @@ class LessonRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsOwnerOrModerator]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
