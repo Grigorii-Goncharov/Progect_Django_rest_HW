@@ -4,7 +4,7 @@ from .views import (
     UserCreateAPIview,
     UserListAPIView,
     UserProfileAPIView,
-    UserDeleteAPIView,
+    UserDeleteAPIView, UserSubscribeAPIView,
 )
 from rest_framework.routers import DefaultRouter
 from django.urls import path
@@ -25,5 +25,8 @@ urlpatterns = [
     path("list/", UserListAPIView.as_view(), name="user-list"),
     path("profile/", UserProfileAPIView.as_view(), name="user-profile"),
     path("profile/delete/", UserDeleteAPIView.as_view(), name="user-delete"),
+    path('subscribe/', UserSubscribeAPIView.as_view(), name='subscribe'),
+    path('subscribe/<int:course_id>/', UserSubscribeAPIView.as_view(), name='subscribe-toggle'),
+
 ]
 urlpatterns += router.urls
