@@ -27,7 +27,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     При создании курса автоматически устанавливается текущий пользователь как владелец.
     """
-
+    serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
     def get_serializer_class(self):
@@ -49,6 +49,12 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Автоматически назначает текущего пользователя владельцем создаваемого курса."""
         serializer.save(owner=self.request.user)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request  # важно для доступа к user
+        return context
+
 
 
 class LessonCreateList(generics.ListCreateAPIView):
