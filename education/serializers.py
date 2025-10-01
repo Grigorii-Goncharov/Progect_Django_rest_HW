@@ -1,8 +1,10 @@
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
 from education.models import Course, Lesson
 from education.validators import CorrectYoutubeVideoUrl
+from users.models import Subscription
 
 
 class LessonSerializer(ModelSerializer):
@@ -34,7 +36,7 @@ class CourseSerializer(ModelSerializer):
         Meta.model (Course): Модель, с которой работает сериализатор.
         Meta.fields (str): "__all__" — включает все поля модели.
     """
-
+    is_subscribed = serializers.SerializerMethodField()
     count_lessons = SerializerMethodField()
 
     def get_count_lessons(self, subj):
@@ -85,6 +87,13 @@ class CourseSerializerList(ModelSerializer):
         """
         return subj.lessons.count()
 
+    def get_is_subscribed(self, obj):
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            return False
+        return Subscription.objects.filter(user=user, course=obj, is_active=True).exists()
+
+
     class Meta:
         model = Course
         fields = [
@@ -94,4 +103,5 @@ class CourseSerializerList(ModelSerializer):
             "preview",
             "count_lessons",
             "lessons",
+            "get_is_subscribed"
         ]
