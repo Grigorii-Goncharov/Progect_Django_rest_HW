@@ -5,7 +5,7 @@ from rest_framework.generics import CreateAPIView, DestroyAPIView, RetrieveUpdat
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from users.models import Payment, User
-from users.serializers import PaymentSerializer, UserSerializer
+from users.serializers import PaymentSerializer, UserSerializer, UserProfileSerializer
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -32,6 +32,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ["course", "lesson", "payment_method"]
     ordering_fields = ["payment_date"]
+    permission_classes = ["IsAuthenticated"]
 
 
 class UserCreateAPIview(CreateAPIView):
@@ -51,11 +52,15 @@ class UserListAPIView(generics.ListAPIView):  # ← ИСПРАВЛЕНО: ListAP
 
 
 class UserProfileAPIView(RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]  # Только авторизованные
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        return self.request.user  # Всегда возвращает текущего пользователя
+        return self.request.user
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return UserProfileSerializer
+        return UserSerializer
 
 
 class UserDeleteAPIView(DestroyAPIView):
