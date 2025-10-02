@@ -1,3 +1,4 @@
+import sys
 from datetime import timedelta
 from pathlib import Path
 import os
@@ -159,3 +160,13 @@ CACHES = {
         'LOCATION': 'redis://127.0.0.1:6379/1',
     }
 }
+
+
+# для теста
+if 'test' in sys.argv:
+    ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']
+
+    # Дополнительные настройки для тестов
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',  # Быстрее для тестов
+    ]
