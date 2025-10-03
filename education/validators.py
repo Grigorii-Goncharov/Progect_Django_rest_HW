@@ -1,6 +1,7 @@
 import re
 
-from education import serializers
+from rest_framework import serializers
+
 
 
 class CorrectYoutubeVideoUrl:

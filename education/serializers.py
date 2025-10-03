@@ -62,15 +62,22 @@ class CourseSerializerList(ModelSerializer):
         - Основные поля курса: id, title, description, preview.
         - Вычисляемое поле `count_lessons` — количество уроков в курсе.
         - Вложенный список уроков через `LessonSerializer`.
-    Используется, когда нужно отобразить курс вместе с деталями его уроков.
+        - Вычисляемое поле `is_subscribed` — указывает, подписан ли текущий пользователь на курс.
+
+    Используется, когда требуется отобразить курс вместе с деталями его уроков и информацией
+    о подписке текущего пользователя.
     Attributes:
-        count_lessons (SerializerMethodField): Поле, вычисляемое методом `get_count_lessons`.
-        lessons (LessonSerializer): Вложенный сериализатор для отображения связанных уроков.
+        count_lessons (SerializerMethodField): Количество уроков в курсе.
+            Значение вычисляется методом `get_count_lessons`.
+        lessons (LessonSerializer): Сериализованный список связанных уроков (только для чтения).
+        is_subscribed (SerializerMethodField): Флаг подписки текущего пользователя на курс.
+            Значение вычисляется методом `get_is_subscribed`.
     Methods:
-        get_count_lessons(subj): Возвращает количество уроков, связанных с курсом.
-    Attributes:
-        Meta.model (Course): Модель, с которой работает сериализатор.
-        Meta.fields (list): Явный список полей для сериализации.
+        get_count_lessons(obj): Возвращает количество уроков, связанных с курсом.
+        get_is_subscribed(obj): Проверяет, подписан ли авторизованный пользователь на курс.
+    Meta:
+        model (Course): Модель, с которой работает сериализатор.
+        fields (list): Список сериализуемых полей, включая вычисляемые и вложенные.
     """
 
     count_lessons = SerializerMethodField()
