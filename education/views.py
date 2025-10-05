@@ -1,5 +1,6 @@
 from rest_framework.permissions import IsAuthenticated
 from education.models import Course, Lesson
+from education.paginators import MyPagination
 from education.serializers import (
     CourseSerializer,
     CourseSerializerList,
@@ -28,7 +29,9 @@ class CourseViewSet(viewsets.ModelViewSet):
     При создании курса автоматически устанавливается текущий пользователь как владелец.
     """
 
+    serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrModerator]
+    pagination_class = MyPagination
 
     def get_serializer_class(self):
         """Возвращает сериализатор в зависимости от действия."""
@@ -50,6 +53,11 @@ class CourseViewSet(viewsets.ModelViewSet):
         """Автоматически назначает текущего пользователя владельцем создаваемого курса."""
         serializer.save(owner=self.request.user)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request  # важно для доступа к user
+        return context
+
 
 class LessonCreateList(generics.ListCreateAPIView):
     """
@@ -64,9 +72,9 @@ class LessonCreateList(generics.ListCreateAPIView):
     При создании урока автоматически устанавливается текущий пользователь как владелец.
     """
 
-    queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = MyPagination
 
     def perform_create(self, serializer):
         """Автоматически назначает текущего пользователя владельцем создаваемого урока."""
@@ -78,7 +86,10 @@ class LessonCreateList(generics.ListCreateAPIView):
         - Модераторы и администраторы получают все уроки.
         - Обычные пользователи получают только свои уроки.
         """
-        if self.request.user.groups.filter(name="Moderator").exists():
+        if (
+            self.request.user.groups.filter(name="Moderator").exists()
+            or self.request.user.is_staff
+        ):
             return Lesson.objects.all()
         return Lesson.objects.filter(owner=self.request.user)
 
@@ -93,9 +104,9 @@ class LessonRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     - Администраторы: полный доступ.
     """
 
-    queryset = Lesson.objects.all()
+    queryset = Lesson.objects.all()  # ← ВСЕ объекты!
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrModerator]  # ← главный пермишен
 
     def get_queryset(self):
         """

@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 
 from config import settings
 
-# from education.models import Course, Lesson
 
 
 class CustomUserManager(BaseUserManager):
@@ -237,3 +236,61 @@ class Payment(models.Model):
         """
         self.full_clean()  # вызываем валидацию перед сохранением
         super().save(*args, **kwargs)
+
+
+
+class Subscription(models.Model):
+    """
+    Модель подписки пользователя на обновления курса.
+    Позволяет отслеживать, за какими курсами следит пользователь,
+    чтобы уведомлять его о новых материалах, изменениях или обновлениях.
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="subscriptions"
+    )
+    course = models.ForeignKey(
+        "education.Course",
+        on_delete=models.CASCADE,
+        verbose_name="Курс",
+        related_name="subscribers"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Активна",
+        help_text="Указывает, активна ли подписка. Неактивные подписки не получают уведомлений."
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата создания",
+        help_text="Дата и время создания подписки."
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Дата обновления",
+        help_text="Дата и время последнего изменения подписки."
+    )
+
+    class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+        unique_together = ("user", "course")  # Один пользователь может быть подписан на курс только один раз
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        status = "активна" if self.is_active else "неактивна"
+        return f"Подписка {self.user} на курс '{self.course}' ({status})"
+
+    def deactivate(self):
+        """Метод для деактивации подписки без её удаления."""
+        self.is_active = False
+        self.save()
+
+    def activate(self):
+        """Метод для повторной активации подписки."""
+        self.is_active = True
+        self.save()
+
