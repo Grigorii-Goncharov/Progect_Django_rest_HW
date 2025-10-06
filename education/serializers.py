@@ -37,7 +37,6 @@ class CourseSerializer(ModelSerializer):
         Meta.fields (str): "__all__" — включает все поля модели.
     """
 
-    is_subscribed = serializers.SerializerMethodField()
     count_lessons = SerializerMethodField()
 
     def get_count_lessons(self, subj):

@@ -45,7 +45,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         - Модераторы и администраторы видят все курсы.
         - Обычные пользователи видят только свои курсы.
         """
-        if self.request.user.groups.filter(name="Moderator").exists():
+        if self.request.user.is_staff or self.request.user.groups.filter(name='Moderator').exists():
             return Course.objects.all()
         return Course.objects.filter(owner=self.request.user)
 
@@ -86,10 +86,7 @@ class LessonCreateList(generics.ListCreateAPIView):
         - Модераторы и администраторы получают все уроки.
         - Обычные пользователи получают только свои уроки.
         """
-        if (
-            self.request.user.groups.filter(name="Moderator").exists()
-            or self.request.user.is_staff
-        ):
+        if self.request.user.is_staff or self.request.user.groups.filter(name='Moderator').exists():
             return Lesson.objects.all()
         return Lesson.objects.filter(owner=self.request.user)
 
@@ -114,6 +111,7 @@ class LessonRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         - Модераторы и администраторы получают все уроки.
         - Обычные пользователи получают только свои уроки.
         """
-        if self.request.user.groups.filter(name="Moderator").exists():
+        user = self.request.user
+        if user.is_staff or user.groups.filter(name="Moderator").exists():
             return Lesson.objects.all()
-        return Lesson.objects.filter(owner=self.request.user)
+        return Lesson.objects.filter(owner=user)

@@ -117,9 +117,8 @@ class User(AbstractUser):
     USERNAME_FIELD = (
         "email"  # Используем email как основной идентификатор для аутентификации
     )
-    REQUIRED_FIELDS = (
-        []
-    )  # Не требует дополнительных полей при создании суперпользователя
+    REQUIRED_FIELDS = ["username"]
+      # Не требует дополнительных полей при создании суперпользователя
 
     class Meta:
         verbose_name = "Пользователь"
@@ -155,7 +154,6 @@ class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ("cash", "Наличные"),
         ("transfer", "Перевод на счет"),
-        ("stripe", "Stripe"),
     ]
 
     user = models.ForeignKey(
