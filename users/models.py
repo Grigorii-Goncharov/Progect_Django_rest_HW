@@ -155,6 +155,7 @@ class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ("cash", "Наличные"),
         ("transfer", "Перевод на счет"),
+        ("stripe", "Stripe"),
     ]
 
     user = models.ForeignKey(
@@ -293,4 +294,5 @@ class Subscription(models.Model):
         """Метод для повторной активации подписки."""
         self.is_active = True
         self.save()
+
 
