@@ -186,7 +186,11 @@ class Payment(models.Model):
     )
     payment_method = models.CharField(
         max_length=10, choices=PAYMENT_METHOD_CHOICES, verbose_name="Способ оплаты"
+
     )
+
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
+
     stripe_payment_intent_id = models.CharField(
         max_length=255,
         blank=True,
