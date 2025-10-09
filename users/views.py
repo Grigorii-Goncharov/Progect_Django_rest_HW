@@ -81,32 +81,30 @@ class UserSubscribeAPIView(APIView):
     работает только с теми методами, которые переопределены"""
     permission_classes = [IsAuthenticated]
 
-
     def post(self, request, *args, **kwargs):
         user = request.user
         # Лучше передавать data в body, а не в GET(используется при POST, PUT, PATCH с форматами: JSON, form-data, etc.)
         # Передача числа курса в теле запроса(request - тело словарь(data), course_id - ключ)
-        course_id = request.data.get('course_id')
+        course_id = request.data.get("course_id")
 
         if not course_id:
             return Response(
                 {"error": "Необходимо указать 'course_id' в теле запроса."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
             course_id = int(course_id)
         except (ValueError, TypeError):
             return Response(
-                {"error": "Некорректный ID курса."},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Некорректный ID курса."}, status=status.HTTP_400_BAD_REQUEST
             )
 
         course = get_object_or_404(Course, id=course_id)
 
         # Проверяем, есть ли уже подписка
         subscription = Subscription.objects.filter(user=user, course=course).first()
-
+        # пропмсывать в postman headers Content-Type: application/json и указать course:2
         if subscription:
             if subscription.is_active:
                 subscription.deactivate()
