@@ -3,7 +3,6 @@ import re
 from rest_framework import serializers
 
 
-
 class CorrectYoutubeVideoUrl:
     """Проверяет, что video_url — это ссылка на YouTube"""
 

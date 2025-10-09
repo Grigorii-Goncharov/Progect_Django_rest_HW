@@ -49,7 +49,6 @@ class CourseSerializer(ModelSerializer):
         """
         return subj.lessons.count()
 
-
     class Meta:
         model = Course
         fields = "__all__"

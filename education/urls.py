@@ -28,11 +28,9 @@ urlpatterns = [
         ),
         name="lesson-update",
     ),
-
     # покупка курса и урока
-    path('courses/<int:course_id>/pay/', PayCourseAPIView.as_view(), name='course-pay'),
-    path('lesson/<int:lesson_id>/pay/', PayLessonAPIView.as_view(), name='lesson-pay'),
-
+    path("courses/<int:course_id>/pay/", PayCourseAPIView.as_view(), name="course-pay"),
+    path("lesson/<int:lesson_id>/pay/", PayLessonAPIView.as_view(), name="lesson-pay"),
 ]
 
 urlpatterns += router.urls
