@@ -7,9 +7,11 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from education.models import Course
+from education.serializers import CourseSerializer, LessonSerializer
 
 from users.models import Payment, User, Subscription
 from users.serializers import PaymentSerializer, UserSerializer, UserProfileSerializer
+from users.services import process_course_payment, process_lesson_payment
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -36,7 +38,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ["course", "lesson", "payment_method"]
     ordering_fields = ["payment_date"]
-    permission_classes = ["IsAuthenticated"]
+    permission_classes = [IsAuthenticated]
 
 
 class UserCreateAPIview(CreateAPIView):
@@ -117,3 +119,42 @@ class UserSubscribeAPIView(APIView):
             message = "Подписка добавлена"
 
         return Response({"message": message}, status=status.HTTP_200_OK)
+
+
+class PayCourseAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, course_id, *args, **kwargs):
+        try:
+            result = process_course_payment(request.user, course_id)
+            course_data = CourseSerializer(result["course"], context={'request': request}).data
+            return Response({
+                "checkout_url": result["checkout_url"],
+                "course": course_data,
+                "payment_id": result["payment"].id
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class PayLessonAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, lesson_id, *args, **kwargs):
+        try:
+            result = process_lesson_payment(request.user, lesson_id)
+            lesson_data = LessonSerializer(result["lesson"], context={'request': request}).data
+            return Response({
+                "checkout_url": result["checkout_url"],
+                "lesson": lesson_data,
+                "payment_id": result["payment"].id
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+

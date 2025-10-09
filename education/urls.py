@@ -1,5 +1,6 @@
 from django.urls import path
 
+from users.views import PayCourseAPIView, PayLessonAPIView
 from .apps import EducationConfig
 from rest_framework.routers import DefaultRouter
 
@@ -27,6 +28,11 @@ urlpatterns = [
         ),
         name="lesson-update",
     ),
+
+    # покупка курса и урока
+    path('courses/<int:course_id>/pay/', PayCourseAPIView.as_view(), name='course-pay'),
+    path('lesson/<int:lesson_id>/pay/', PayLessonAPIView.as_view(), name='lesson-pay'),
+
 ]
 
 urlpatterns += router.urls

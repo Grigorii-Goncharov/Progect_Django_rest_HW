@@ -117,9 +117,8 @@ class User(AbstractUser):
     USERNAME_FIELD = (
         "email"  # Используем email как основной идентификатор для аутентификации
     )
-    REQUIRED_FIELDS = (
-        []
-    )  # Не требует дополнительных полей при создании суперпользователя
+    REQUIRED_FIELDS = ["username"]
+      # Не требует дополнительных полей при создании суперпользователя
 
     class Meta:
         verbose_name = "Пользователь"
@@ -187,7 +186,24 @@ class Payment(models.Model):
     )
     payment_method = models.CharField(
         max_length=10, choices=PAYMENT_METHOD_CHOICES, verbose_name="Способ оплаты"
+
     )
+
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
+
+    stripe_payment_intent_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="ID платежа в Stripe"
+    )
+    stripe_status = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name="Статус платежа в Stripe"
+    )
+
 
     class Meta:
         verbose_name = "Платеж"
@@ -293,4 +309,5 @@ class Subscription(models.Model):
         """Метод для повторной активации подписки."""
         self.is_active = True
         self.save()
+
 

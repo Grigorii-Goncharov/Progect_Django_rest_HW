@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from users.models import User
@@ -26,6 +27,14 @@ class Course(models.Model):
         null=True,
         help_text="Изображение-превью для отображения в списке курсов. Поддерживаются JPG, PNG.",
     )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Стоимость курса",
+        default=500.00,
+        validators=[MinValueValidator(0)]
+    )
+
 
     owner = models.ForeignKey(
         User,
@@ -84,6 +93,14 @@ class Lesson(models.Model):
         verbose_name="Курс",
         help_text="Курс, к которому относится этот урок. При удалении урока — уроки удаляются.",
     )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Стоимость Урока",
+        default=100.00,
+        validators=[MinValueValidator(0)]
+    )
+
 
     owner = models.ForeignKey(
         User,

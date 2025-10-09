@@ -37,7 +37,6 @@ class CourseSerializer(ModelSerializer):
         Meta.fields (str): "__all__" — включает все поля модели.
     """
 
-    is_subscribed = serializers.SerializerMethodField()
     count_lessons = SerializerMethodField()
 
     def get_count_lessons(self, subj):
@@ -49,6 +48,7 @@ class CourseSerializer(ModelSerializer):
             int: Количество связанных объектов Lesson.
         """
         return subj.lessons.count()
+
 
     class Meta:
         model = Course
@@ -81,6 +81,7 @@ class CourseSerializerList(ModelSerializer):
     """
 
     count_lessons = SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
     lessons = LessonSerializer(
         many=True, read_only=True
     )  # many = уроков может быть несколько(берем сериализатор урока)
@@ -112,5 +113,5 @@ class CourseSerializerList(ModelSerializer):
             "preview",
             "count_lessons",
             "lessons",
-            "get_is_subscribed",
+            "is_subscribed",
         ]
