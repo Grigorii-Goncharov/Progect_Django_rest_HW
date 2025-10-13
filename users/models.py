@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from config import settings
 
 
-
 class CustomUserManager(BaseUserManager):
     """
     Кастомный менеджер пользователя для работы с электронной почтой как с уникальным идентификатором.
@@ -118,7 +117,7 @@ class User(AbstractUser):
         "email"  # Используем email как основной идентификатор для аутентификации
     )
     REQUIRED_FIELDS = ["username"]
-      # Не требует дополнительных полей при создании суперпользователя
+    # Не требует дополнительных полей при создании суперпользователя
 
     class Meta:
         verbose_name = "Пользователь"
@@ -186,24 +185,16 @@ class Payment(models.Model):
     )
     payment_method = models.CharField(
         max_length=10, choices=PAYMENT_METHOD_CHOICES, verbose_name="Способ оплаты"
-
     )
 
     stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
 
     stripe_payment_intent_id = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name="ID платежа в Stripe"
+        max_length=255, blank=True, null=True, verbose_name="ID платежа в Stripe"
     )
     stripe_status = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        verbose_name="Статус платежа в Stripe"
+        max_length=50, blank=True, null=True, verbose_name="Статус платежа в Stripe"
     )
-
 
     class Meta:
         verbose_name = "Платеж"
@@ -254,7 +245,6 @@ class Payment(models.Model):
         super().save(*args, **kwargs)
 
 
-
 class Subscription(models.Model):
     """
     Модель подписки пользователя на обновления курса.
@@ -266,34 +256,37 @@ class Subscription(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пользователь",
-        related_name="subscriptions"
+        related_name="subscriptions",
     )
     course = models.ForeignKey(
         "education.Course",
         on_delete=models.CASCADE,
         verbose_name="Курс",
-        related_name="subscribers"
+        related_name="subscribers",
     )
     is_active = models.BooleanField(
         default=True,
         verbose_name="Активна",
-        help_text="Указывает, активна ли подписка. Неактивные подписки не получают уведомлений."
+        help_text="Указывает, активна ли подписка. Неактивные подписки не получают уведомлений.",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Дата создания",
-        help_text="Дата и время создания подписки."
+        help_text="Дата и время создания подписки.",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name="Дата обновления",
-        help_text="Дата и время последнего изменения подписки."
+        help_text="Дата и время последнего изменения подписки.",
     )
 
     class Meta:
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
-        unique_together = ("user", "course")  # Один пользователь может быть подписан на курс только один раз
+        unique_together = (
+            "user",
+            "course",
+        )  # Один пользователь может быть подписан на курс только один раз
         ordering = ["-created_at"]
 
     def __str__(self):
@@ -309,5 +302,3 @@ class Subscription(models.Model):
         """Метод для повторной активации подписки."""
         self.is_active = True
         self.save()
-
-

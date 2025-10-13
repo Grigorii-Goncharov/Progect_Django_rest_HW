@@ -17,7 +17,16 @@ class PaymentSerializer(ModelSerializer):
 
     class Meta:
         model = Payment
-        fields = ["id", "user", "course", "lesson", "amount", "payment_method", "payment_date", "stripe_session_id"]
+        fields = [
+            "id",
+            "user",
+            "course",
+            "lesson",
+            "amount",
+            "payment_method",
+            "payment_date",
+            "stripe_session_id",
+        ]
         read_only_fields = ["id", "user", "payment_date"]
 
 
@@ -34,12 +43,10 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ["username", "email", "first_name", "last_name", "password"]
-        extra_kwargs = {
-            "password": {"write_only": True}
-        }
+        extra_kwargs = {"password": {"write_only": True}}
 
     def update(self, instance, validated_data):
-        password = validated_data.pop('password', None)
+        password = validated_data.pop("password", None)
         user = super().update(instance, validated_data)
         if password:
             user.set_password(password)
@@ -70,5 +77,3 @@ class SubscribeSerializer(ModelSerializer):
     class Meta:
         model = Subscription
         fields = "__all__"
-
-

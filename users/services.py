@@ -9,15 +9,12 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 def create_stripe_product_and_price(name, description, amount, currency="usd"):
     """Создаёт продукт и цену в Stripe, возвращает ID цены."""
-    product = stripe.Product.create(
-        name=name,
-        description=description[:200]
-    )
+    product = stripe.Product.create(name=name, description=description[:200])
     price = stripe.Price.create(
         product=product.id,
         unit_amount=int(amount * 100),  # в центах
         currency=currency,
-        recurring=None
+        recurring=None,
     )
     return price.id
 
@@ -36,7 +33,7 @@ def create_payment_record(user, course=None, lesson=None):
         lesson=lesson,
         amount=amount,
         payment_method="transfer",
-        stripe_status="pending"
+        stripe_status="pending",
     )
 
 
@@ -47,9 +44,7 @@ def process_course_payment(user, course_id):
 
     description = f"Оплата курса: {course.title}"
     price_id = create_stripe_product_and_price(
-        name=course.title,
-        description=description,
-        amount=course.price
+        name=course.title, description=description, amount=course.price
     )
 
     session_data = create_checkout_session(
@@ -57,18 +52,14 @@ def process_course_payment(user, course_id):
         price_id=price_id,
         payment_id=payment.id,
         item_type="course",
-        item_id=course.id
+        item_id=course.id,
     )
 
     # Обновляем платеж
     payment.stripe_payment_intent_id = session_data["payment_intent"]
     payment.save()
 
-    return {
-        "payment": payment,
-        "course": course,
-        "checkout_url": session_data["url"]
-    }
+    return {"payment": payment, "course": course, "checkout_url": session_data["url"]}
 
 
 def process_lesson_payment(user, lesson_id):
@@ -78,9 +69,7 @@ def process_lesson_payment(user, lesson_id):
 
     description = f"Оплата урока: {lesson.title} (курс: {lesson.course.title})"
     price_id = create_stripe_product_and_price(
-        name=lesson.title,
-        description=description,
-        amount=lesson.price
+        name=lesson.title, description=description, amount=lesson.price
     )
 
     session_data = create_checkout_session(
@@ -88,24 +77,21 @@ def process_lesson_payment(user, lesson_id):
         price_id=price_id,
         payment_id=payment.id,
         item_type="lesson",
-        item_id=lesson.id
+        item_id=lesson.id,
     )
 
     payment.stripe_payment_intent_id = session_data["payment_intent"]
     payment.save()
 
-    return {
-        "payment": payment,
-        "lesson": lesson,
-        "checkout_url": session_data["url"]
-    }
+    return {"payment": payment, "lesson": lesson, "checkout_url": session_data["url"]}
+
 
 def create_checkout_session(user, price_id, payment_id, item_type, item_id):
     """Создаёт итоговый результат сессии после оплаты"""
     metadata = {
         "payment_id": str(payment_id),
         "type": item_type,
-        "course_id" if item_type == "course" else "lesson_id": str(item_id)
+        "course_id" if item_type == "course" else "lesson_id": str(item_id),
     }
 
     session = stripe.checkout.Session.create(
@@ -115,9 +101,6 @@ def create_checkout_session(user, price_id, payment_id, item_type, item_id):
         customer_email=user.email,
         success_url="http://127.0.0.1:8000/",
         cancel_url="http://127.0.0.1:8000/",
-        metadata=metadata
+        metadata=metadata,
     )
-    return {
-        "url": session.url,
-        "payment_intent": session.payment_intent
-    }
+    return {"url": session.url, "payment_intent": session.payment_intent}

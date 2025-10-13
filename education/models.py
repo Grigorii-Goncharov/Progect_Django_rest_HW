@@ -32,9 +32,8 @@ class Course(models.Model):
         decimal_places=2,
         verbose_name="Стоимость курса",
         default=500.00,
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(0)],
     )
-
 
     owner = models.ForeignKey(
         User,
@@ -98,9 +97,8 @@ class Lesson(models.Model):
         decimal_places=2,
         verbose_name="Стоимость Урока",
         default=100.00,
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(0)],
     )
-
 
     owner = models.ForeignKey(
         User,

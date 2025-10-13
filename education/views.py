@@ -8,6 +8,7 @@ from education.serializers import (
 )
 from rest_framework import viewsets, generics
 from users.permissions import IsOwnerOrModerator
+from education.tasks import send_mail_update_course_notification
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -45,7 +46,10 @@ class CourseViewSet(viewsets.ModelViewSet):
         - Модераторы и администраторы видят все курсы.
         - Обычные пользователи видят только свои курсы.
         """
-        if self.request.user.is_staff or self.request.user.groups.filter(name='Moderator').exists():
+        if (
+            self.request.user.is_staff
+            or self.request.user.groups.filter(name="Moderator").exists()
+        ):
             return Course.objects.all()
         return Course.objects.filter(owner=self.request.user)
 
@@ -57,6 +61,11 @@ class CourseViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context["request"] = self.request  # важно для доступа к user
         return context
+
+    def perform_update(self, serializer):
+        """При методе PUT или PATCH срабатывает task на отправку сообщения при изменении курса"""
+        course = serializer.save()
+        send_mail_update_course_notification.delay(course.id)
 
 
 class LessonCreateList(generics.ListCreateAPIView):
@@ -86,7 +95,10 @@ class LessonCreateList(generics.ListCreateAPIView):
         - Модераторы и администраторы получают все уроки.
         - Обычные пользователи получают только свои уроки.
         """
-        if self.request.user.is_staff or self.request.user.groups.filter(name='Moderator').exists():
+        if (
+            self.request.user.is_staff
+            or self.request.user.groups.filter(name="Moderator").exists()
+        ):
             return Lesson.objects.all()
         return Lesson.objects.filter(owner=self.request.user)
 
