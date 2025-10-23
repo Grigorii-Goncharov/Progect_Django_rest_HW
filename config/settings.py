@@ -93,16 +93,16 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         "NAME": os.getenv("DB_NAME"),
+#         "USER": os.getenv("DB_USER"),
+#         "PASSWORD": os.getenv("DB_PASSWORD"),
+#         "HOST": os.getenv("DB_HOST"),
+#         "PORT": os.getenv("DB_PORT"),
+#     }
+# }
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -177,25 +177,25 @@ if "test" in sys.argv:
 
 
 # Настройки Celery
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
-
-# Используем eventlet на Windows
-CELERY_WORKER_POOL = "eventlet"
-CELERY_WORKER_POOL_RESTARTS = True
-
-# Опционально: сериализация
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_SERIALIZER = "json"
-CELERY_TIMEZONE = "TIME_ZONE"
-
-CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-
-# Настройки Celery Beat (планировщик)
-CELERY_BEAT_SCHEDULE = {
-    "deactivate-inactive-users-daily": {
-        "task": "educations.tasks.deactivate_inactive_users",
-        "schedule": crontab(hour=2, minute=0),  # каждый день в 02:00
-    },
-}
+# CELERY_BROKER_URL = "redis://localhost:6379/0"
+# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+#
+# # Используем eventlet на Windows
+# CELERY_WORKER_POOL = "eventlet"
+# CELERY_WORKER_POOL_RESTARTS = True
+#
+# # Опционально: сериализация
+# CELERY_ACCEPT_CONTENT = ["json"]
+# CELERY_TASK_SERIALIZER = "json"
+# CELERY_RESULT_SERIALIZER = "json"
+# CELERY_TIMEZONE = "TIME_ZONE"
+#
+# CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+#
+# # Настройки Celery Beat (планировщик)
+# CELERY_BEAT_SCHEDULE = {
+#     "deactivate-inactive-users-daily": {
+#         "task": "educations.tasks.deactivate_inactive_users",
+#         "schedule": crontab(hour=2, minute=0),  # каждый день в 02:00
+#     },
+# }
