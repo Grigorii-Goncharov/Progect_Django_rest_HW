@@ -1,0 +1,80 @@
+version: '3.12'
+
+services:
+# ПРОПИСЫВАЕМ запуск своего DJANGO приложения:
+  web:
+    build: .
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    # тома для сохранения данных вне контейнера
+    volumes:
+      - .:/Progect_Django_rest_HW
+      - static_volume:/Progect_Django_rest_HW/static
+      - media_volume:/Progect_Django_rest_HW/media
+    ports:
+      - "8000:8000"
+    # условия запуска(не будет работать, пока не запустятся зависимости)
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+    # переназначение сторонних сервисов по имени
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+
+# ПРОПИСЫВАЕМ Celery:
+  worker:
+    build: .
+    command: celery -A config worker --loglevel=info --pool=eventlet
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - .:/DJANGO_REST_HW
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+
+# ПРОПИСЫВАЕМ Celery beat:
+  beat:
+    build: .
+    command: celery -A config beat --loglevel=info #--scheduler django_celery_beat.schedulers:DatabaseScheduler - в случае перенаправления
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - .:/DJANGO_REST_HW
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+
+# ПРОПИСЫВАЕМ redis (получаем образ с dockerhub):
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+# ПРОПИСЫВАЕМ postgres(db это DB_HOST) (получаем образ с dockerhub):
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    env_file:
+      - .env
+# Перечисляем имена томов без параметров, которые участвует в работе
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

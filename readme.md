@@ -117,6 +117,62 @@ J   WT-аутентификация: безопасный вход и управ
     Производительность: пагинация на всех списках, фильтрация платежей.
     Валидация: ссылки на видео проверяются на принадлежность YouTube.
 
+
+6. **DOCKER**
+   ```bash
+   ЭТАПЫ ЗАПУСКА КОНТЕЙНЕРОВ(при compose)
+   1.*Пишем Dockerfile*
+   2.*Пишем docker-compose.yml*
+   3.*Выполняем сборку: docker-compose build*
+    ИЛИ *Можно унифицировать: docker-compose up -d --build* 
+    ( Если образы для сервисов еще не созданы, они будут собраны перед запуском.)
+
+    Команда для создания образа из докерфайла с присваиванием имени(-t) (важно что бы poetry lock и toml использовали одну версию пайтона)
+    docker build -t django_rest_hw .
+
+    Команда просмотра образов
+    docker images
+   
+    Команда просмотра логов 
+    docker logs my-django-app
+   
+    Команда просмотра контейнеров и удаления по id 
+    docker ps  
+   
+   Команда удаления контейнеров по id 
+   docker stop <контейнер id>
+
+   Команда остановки контейнера и чистки кэша
+   docker stop my-django-app
+   
+   Команда чистки кэша
+   docker rm my-django-app
+
+   Запуск контейнера с параметрами .env как 1 контейнер на фоне(-d)
+   -указываем имя контейнера(--name)
+   -порт(-p)
+   -env-файл (--env-file)
+   - и имя образа
+   *(d settings ALLOWED_HOSTS = ['*'] для разработки)*
+    docker run -d --name my-django-app -p 8000:8000 --env-file .env project_django_rest_hw
+
+   Команда повторного запуска контейнера
+   docker start my-django-app
+
+ **РАБОТА С DOCKER COMPOSE**
+   ```bash
+   Сборка образа на фоне(-d)
+   docker-compose up -d --build
+
+   Остановка всех работающих контейнеров
+   docker-compose down
+
+   Просмотр логов и id всех контейнеров
+   docker-compose logs
+   docker-compose ps
+
+
+
 ## Лицензия 
    Этот проект распространяется по лицензии MIT.
 
