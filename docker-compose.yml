@@ -4,7 +4,7 @@ services:
 # ПРОПИСЫВАЕМ запуск своего DJANGO приложения:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     # тома для сохранения данных вне контейнера
     volumes:
       - .:/Progect_Django_rest_HW
@@ -43,7 +43,7 @@ services:
 # ПРОПИСЫВАЕМ Celery beat:
   beat:
     build: .
-    command: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: celery -A config beat --loglevel=info #--scheduler django_celery_beat.schedulers:DatabaseScheduler - в случае перенаправления
     depends_on:
       - redis
       - db

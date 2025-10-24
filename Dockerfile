@@ -2,21 +2,7 @@ FROM python:3.12-slim
 
 # Устанавливаем системные зависимости для компиляции пакетов из документации
 #каждой отдельной зависимости для установки через Debian/Ubuntu
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Build dependencies
-    gcc \
-    libc6-dev \
-    libpq-dev \
-    libjpeg-dev \
-    zlib1g-dev \
-    libpng-dev \
-    libfreetype6-dev \
-    # Runtime dependencies (critical!)
-    libpq5 \
-    libjpeg62-turbo \
-    libpng16-16 \
-    libfreetype6 \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && pip install poetry
 
 # Рабочая директория
 WORKDIR /Progect_Django_rest_HW
