@@ -115,16 +115,32 @@ WSGI_APPLICATION = "config.wsgi.application"
 #         }
 #     }
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST", "localhost"),  # ← будет "db" в Docker
-        "PORT": os.getenv("DB_PORT", "5432"),
+# Определяем, запущено ли в Docker (по наличию специальной переменной)
+USE_DOCKER = os.getenv("USE_DOCKER", "False") == "True"
+#if "docker-compose" in sys.argv[0]: - перехват в консоли по названию записи
+if USE_DOCKER:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),  # "db" (имя сервиса docker-compose из .env)
+            "PORT": os.getenv("DB_PORT"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": "localhost",  # локальный PostgreSQL
+            "PORT": os.getenv("DB_PORT"),
+        }
+    }
+
 
 
 AUTH_PASSWORD_VALIDATORS = [

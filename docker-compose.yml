@@ -1,18 +1,15 @@
 version: '3.12'
 
 services:
-# ПРОПИСЫВАЕМ запуск своего DJANGO приложения:
+# ПРОПИСЫВАЕМ DJANGO приложение
   web:
     build: .
-# команда запуска с автомиграциями
-#    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-
-# команда для production:
-    command: sh -c "python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    command: sh -c "python manage.py collectstatic --noinput 
+             && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
     # тома для сохранения данных вне контейнера
     volumes:
       - .:/Progect_Django_rest_HW
-      - static_volume:/Progect_Django_rest_HW/static
+      - static_volume:/Progect_Django_rest_HW/staticfiles
       - media_volume:/Progect_Django_rest_HW/media
     ports:
       - "8000:8000"
@@ -20,15 +17,12 @@ services:
     depends_on:
       - db
       - redis
-    env_file:
-      - .env
-    # переназначение сторонних сервисов по имени
+    #env_file не нужен, т.к. он есть в образе dockerfile и  используешь load_dotenv() в коде
+      #и файл .env попал в контейнер (через COPY или volumes).
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - REDIS_URL=redis://redis:6379/0
+      - USE_DOCKER=True #важный флаг переключения БД в settings
 
-# ПРОПИСЫВАЕМ Celery:
+# ПРОПИСЫВАЕМ Celery
   worker:
     build: .
     command: celery -A config worker --loglevel=info --pool=eventlet
@@ -36,42 +30,38 @@ services:
       - redis
       - db
     volumes:
-      - .:/DJANGO_REST_HW
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - REDIS_URL=redis://redis:6379/0
+      - .:/Progect_Django_rest_HW
+    #env_file не нужен, так как файл .env лежит рядом с docker-compose.yml
+    #volumes: .:/DJANGO_REST_HW → значит, .env доступен → load_dotenv() прочитает его → переменные будут в os.getenv()
+    # environment не нужен, так как я ничего не переопределяю и данные берутся из .env
 
-# ПРОПИСЫВАЕМ Celery beat:
+
+# ПРОПИСЫВАЕМ Celery beat
   beat:
     build: .
-    command: celery -A config beat --loglevel=info #--scheduler django_celery_beat.schedulers:DatabaseScheduler - в случае перенаправления
+    command: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     depends_on:
       - redis
       - db
     volumes:
-      - .:/DJANGO_REST_HW
-    env_file:
-      - .env
+      - .:/Progect_Django_rest_HW
+    #env_file не нужен, так как файл .env лежит рядом с docker-compose.yml
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - REDIS_URL=redis://redis:6379/0
+      - USE_DOCKER=True #важный флаг переключения БД в settings(обязателен для BEAT)
 
-# ПРОПИСЫВАЕМ redis (получаем образ с dockerhub):
+# ПРОПИСЫВАЕМ redis
   redis:
+    # получаем образ с dockerhub
     image: redis:7-alpine
     ports:
       - "6379:6379"
 
-  # ПРОПИСЫВАЕМ web-server:
+#ПРОПИСЫВАЕМ ВЕБ СЕРВЕР
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
-      - "443:443"  # если будете настраивать HTTPS
+      - "443:443"# если будете настраивать HTTPS
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - static_volume:/static
@@ -79,7 +69,7 @@ services:
     depends_on:
       - web
 
-  # ПРОПИСЫВАЕМ postgres(db это DB_HOST) (получаем образ с dockerhub):
+# ПРОПИСЫВАЕМ postgres(db это DB_HOST)
   db:
     image: postgres:16
     volumes:
@@ -89,7 +79,10 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     env_file:
-      - .env
+      - .env #Хоть он лежит рядом, но лучше явно указать
+      #Нужен так как мы переопределяем environment и берем
+      # данные из .env который лежит рядом - РАБОТА НА УРОВНЕ КОНТЕЙНЕРА, А НЕ DJANGO
+
 # Перечисляем имена томов без параметров, которые участвует в работе
 volumes:
   postgres_data:
