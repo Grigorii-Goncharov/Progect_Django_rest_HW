@@ -130,10 +130,10 @@ jobs:
       - name: Применить миграции и Запустить тесты
         env:
           SECRET_KEY: test123
-          DB_NAME: postgres,
-          DB_USER: postgres,
-          DB_PASSWORD: postgres,
-          DB_PORT: 5432,
+          DB_NAME: postgres
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_PORT: 5432
         run: |
           poetry run python manage.py migrate --noinput
           poetry run python manage.py test
