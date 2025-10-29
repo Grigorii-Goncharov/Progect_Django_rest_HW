@@ -88,7 +88,7 @@ class UserSubscribeAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        # Лучше передавать data в body, а не в GET(используется при POST, PUT, PATCH с форматами: JSON, form-data, etc.)
+        # Лучше передавать data в body, а не в GET(используется при POST, PUT, PATCH с форматами: JSON, form-data, ...)
         # Передача числа курса в теле запроса(request - тело словарь(data), course_id - ключ)
         course_id = request.data.get("course_id")
 
