@@ -200,8 +200,7 @@ jobs:
   # 4. ДЕПЛОЙ ПО SSH (основной способ без Docker)
   # ───────────────────────────────────────
   deploy-ssh:
-    needs: [test, security]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Настроить SSH
