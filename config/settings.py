@@ -128,7 +128,6 @@ DATABASES = {
 }
 
 
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -207,8 +206,12 @@ if "test" in sys.argv:
 # CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
 # Настройки Celery для работы с докером:
-CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0') # Используем REDIS_URL из окружения
-CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0') # Используем REDIS_URL из окружения
+CELERY_BROKER_URL = os.getenv(
+    "REDIS_URL", "redis://localhost:6379/0"
+)  # Используем REDIS_URL из окружения
+CELERY_RESULT_BACKEND = os.getenv(
+    "REDIS_URL", "redis://localhost:6379/0"
+)  # Используем REDIS_URL из окружения
 
 
 # Используем eventlet на Windows
