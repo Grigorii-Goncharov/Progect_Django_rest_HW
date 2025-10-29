@@ -59,8 +59,37 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
-    env:
-      DJANGO_SETTINGS_MODULE: config.settings_ci
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          REDIS_DB: 0
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+        redis:
+          image: redis:7
+          ports:
+            - 6379:6379
+          options: >-
+            --health-cmd "redis-cli ping"
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -84,11 +113,32 @@ jobs:
       - name: Установить зависимости
         run: poetry install --no-interaction
 
-      - name: Применить миграции
-        run: poetry run python manage.py migrate --noinput
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+          echo "Waiting for PostgreSQL..."
+          sleep 1
+          done
 
-      - name: Запустить тесты
-        run: poetry run python manage.py test
+      - name: Wait for Redis
+        run: |
+          until redis-cli -h localhost -p 6379 ping | grep -q "PONG"; do
+            echo "Waiting for Redis..."
+            sleep 1
+          done
+
+      - name: Применить миграции и Запустить тесты
+        env:
+          DB_NAME: postgres,
+          DB_USER: postgres,
+          DB_PASSWORD: postgres,
+          DB_HOST: localhost,
+          DB_PORT: 5432,
+        run: |
+          poetry run python manage.py migrate --noinput
+          poetry run python manage.py test
+          
+
 
       # ─── PIP (закомментирован) ────────────────────────
       # - name: Кэшировать pip
