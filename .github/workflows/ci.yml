@@ -204,9 +204,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Настроить SSH
-        uses: webfactory/ssh-agent@v0.8.1
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.SECRET_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
 
       - name: Копировать код на сервер
         run: |
@@ -222,7 +224,6 @@ jobs:
 
       - name: Запустить деплой на сервере (Poetry)
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }} << EOF
             cd ${{ secrets.DEPLOY_DIR }}
 
             # Установить Poetry, если нужно
@@ -238,7 +239,6 @@ jobs:
 
             # Перезапуск (systemd)
             sudo systemctl restart myapp.service
-          EOF
 
       # ─── АЛЬТЕРНАТИВА: деплой через pip ───────────────
       # - name: Деплой через pip (закомментирован)
