@@ -1,0 +1,256 @@
+# 🏷 Название — отображается в GitHub Actions
+name: Django Full CI/CD Pipeline
+
+# Когда запускать: при пуше или Pull Request в любые ветки
+on:
+  push:
+    branches: [ "main", "master", "develop", "feature_35_Nginx_GithubActions"]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+
+#Альтернатива, если не важно с какими ветками происходят манипуляции
+#on:
+#  push:
+#  pull_request:
+
+
+jobs:
+
+  # ───────────────────────────────────────
+  #  1. ЛИНТЕР: flake8 (работает и с pip, и с Poetry)
+  # ───────────────────────────────────────
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name:  Checkout кода
+        uses: actions/checkout@v4
+
+      - name: Установить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ─── ОСНОВНОЙ ВАРИАНТ: Poetry ─────────────────────
+      - name: Установить Poetry
+        run: pip install poetry
+
+      - name: Установить зависимости через Poetry
+        run: poetry install --no-interaction
+
+      - name: Проверить код с flake8
+        run: poetry run flake8 .
+
+      - name: Проверить форматирование с black
+        run: poetry run black --check .
+
+      # ─── АЛЬТЕРНАТИВА: pip (закомментирована для сравнения) ───
+      # - name: Установить flake8 через pip
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip install flake8
+      #
+      # - name:  Запустить flake8 через pip
+      #   run: flake8 .
+
+
+  # ───────────────────────────────────────
+  #  2. ТЕСТЫ: Django (зависит от линтера)
+  # ───────────────────────────────────────
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings_ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name:  Установить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Кэшировать зависимости Poetry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Установить Poetry
+        run: pip install poetry
+
+      - name: Установить зависимости
+        run: poetry install --no-interaction
+
+      - name: Применить миграции
+        run: poetry run python manage.py migrate --noinput
+
+      - name: Запустить тесты
+        run: poetry run python manage.py test
+
+      # ─── PIP (закомментирован) ────────────────────────
+      # - name: Кэшировать pip
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.cache/pip
+      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pip-
+      #
+      # - name:  Установить зависимости через pip
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip install -r requirements.txt
+      #
+      # - name: 🗃 Миграции (pip)
+      #   run: python manage.py migrate --noinput
+      #
+      # - name: Тесты (pip)
+      #   run: python manage.py test
+
+
+  # ───────────────────────────────────────
+  # 3. БЕЗОПАСНОСТЬ: проверка уязвимостей
+  # ───────────────────────────────────────
+  security:
+    needs: lint  # можно запускать параллельно с test
+    runs-on: ubuntu-latest
+    steps:
+      - name:  Checkout
+        uses: actions/checkout@v4
+
+      - name:  Установить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ─── POETRY ───────────────────────────────────────
+      - name: Установить Poetry + safety
+        run: |
+          pip install poetry safety
+
+      - name: Установить зависимости
+        run: poetry install --no-interaction
+
+      - name: Проверить уязвимости
+        run: poetry run safety check --full-report
+
+
+      # ─── PIP (альтернатива) ───────────────────────────
+      # - name: Установить safety через pip
+      #   run: pip install safety
+      #
+      # - name: 🛡 Проверить через pip
+      #   run: safety check -r requirements.txt --full-report
+
+
+  # ───────────────────────────────────────
+  # 4. ДЕПЛОЙ ПО SSH (основной способ без Docker)
+  # ───────────────────────────────────────
+  deploy-ssh:
+    needs: [test, security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Настроить SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Копировать код на сервер
+        run: |
+          rsync -avz \
+            --exclude='.git/' \
+            --exclude='__pycache__/' \
+            --exclude='*.pyc' \
+            --exclude='.github/' \
+            --exclude='.env' \
+            --exclude='poetry.lock' \
+            --exclude='pyproject.toml' \
+            . ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }}:${{ secrets.DEPLOY_DIR }}
+
+      - name: Запустить деплой на сервере (Poetry)
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }} << EOF
+            cd ${{ secrets.DEPLOY_DIR }}
+
+            # Установить Poetry, если нужно
+            if ! command -v poetry &> /dev/null; then
+              pip3 install poetry
+              poetry config virtualenvs.in-project true
+            fi
+
+            # Установить зависимости и обновить приложение
+            poetry install --no-interaction
+            poetry run python manage.py migrate --noinput
+            poetry run python manage.py collectstatic --noinput
+
+            # Перезапуск (systemd)
+            sudo systemctl restart myapp.service
+          EOF
+
+      # ─── АЛЬТЕРНАТИВА: деплой через pip ───────────────
+      # - name: Деплой через pip (закомментирован)
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }} << EOF
+      #       cd ${{ secrets.DEPLOY_DIR }}
+      #       python3 -m venv venv
+      #       source venv/bin/activate
+      #       pip install -r requirements.txt
+      #       python manage.py migrate --noinput
+      #       python manage.py collectstatic --noinput
+      #       sudo systemctl restart myapp.service
+      #     EOF
+
+
+  # ───────────────────────────────────────
+  # 5. ДЕПЛОЙ ЧЕРЕЗ DOCKER (современный способ)
+  # ───────────────────────────────────────
+  deploy-docker:
+    needs: [test, security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Войти в Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # ─── СБОРКА ОБРАЗА ────────────────────────────────
+      - name: Собрать и запушить образ
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }}
+
+      # ─── ЗАПУСК НА СЕРВЕРЕ ────────────────────────────
+      - name: Настроить SSH для запуска контейнера
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+
+      - name: Обновить контейнер на сервере
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          # Добавьте другие секреты, если нужно:
+          # DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }} << EOF
+            docker stop my-django-app || true
+            docker rm my-django-app || true
+            docker run -d \
+              --name my-django-app \
+              --restart unless-stopped \
+              -p 8000:8000 \
+              -e SECRET_KEY="$SECRET_KEY" \
+              -e DEBUG="False" \
+              "$DOCKER_IMAGE"
+          EOF
