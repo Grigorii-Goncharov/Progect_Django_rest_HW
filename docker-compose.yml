@@ -55,6 +55,11 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
 #ПРОПИСЫВАЕМ ВЕБ СЕРВЕР
   nginx:
@@ -84,6 +89,11 @@ services:
       # данные из .env который лежит рядом - РАБОТА НА УРОВНЕ КОНТЕЙНЕРА, А НЕ DJANGO
 
 # Перечисляем имена томов без параметров, которые участвует в работе
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_DB_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 volumes:
   postgres_data:
   static_volume:
