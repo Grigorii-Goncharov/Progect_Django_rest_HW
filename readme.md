@@ -172,6 +172,14 @@ J   WT-аутентификация: безопасный вход и управ
    docker-compose ps
 
 
+7. **DOCKER**
+   ```bash
+   1. Заходим в настройки проекта на GitHub и выберавем *Secrets and variables*
+   2. Добавляем новый секрет по кнопке *New repository secret* 
+   3. на сервере созддаем новый ключ для GitHub ACTIONS:
+   ssh-keygen -t ed25519 -C "github-actions@your-repo" -f github_actions_key
+   и получите его из терминала
+   cat github_actions_key.pub
 
 ## Лицензия 
    Этот проект распространяется по лицензии MIT.
