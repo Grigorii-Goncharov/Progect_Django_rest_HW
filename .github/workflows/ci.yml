@@ -129,6 +129,7 @@ jobs:
 
       - name: Применить миграции и Запустить тесты
         env:
+          SECRET_KEY: test123
           DB_NAME: postgres,
           DB_USER: postgres,
           DB_PASSWORD: postgres,
