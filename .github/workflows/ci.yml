@@ -203,12 +203,17 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Настроить SSH
-        uses: appleboy/ssh-action@v1.0.3
+#      - name: Настроить SSH
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.SECRET_IP }}
+#          username: ${{ secrets.SSH_USER }}
+#          key: ${{ secrets.SSH_KEY }}
+      - name: 🔑 Настроить SSH
+          # Актуальная версия ДЛЯ ДЕПЛОЯ webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          host: ${{ secrets.SECRET_IP }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Копировать код на сервер
         run: |
