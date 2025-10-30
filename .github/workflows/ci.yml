@@ -215,6 +215,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      - name: Добавить сервер в known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
       - name: Копировать код на сервер
         run: |
           rsync -avz \
@@ -262,49 +267,49 @@ jobs:
   # ───────────────────────────────────────
   # 5. ДЕПЛОЙ ЧЕРЕЗ DOCKER (современный способ)
   # ───────────────────────────────────────
-  deploy-docker:
-    needs: [test, security]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Войти в Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      # ─── СБОРКА ОБРАЗА ────────────────────────────────
-      - name: Собрать и запушить образ
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }}
-
-      # ─── ЗАПУСК НА СЕРВЕРЕ ────────────────────────────
-      - name: Настроить SSH для запуска контейнера
-        uses: webfactory/ssh-agent@v0.8.1
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-
-
-      - name: Обновить контейнер на сервере
-        env:
-          DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          # Добавьте другие секреты, если нужно:
-          # DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          # ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }} << EOF
-            docker stop my-django-app || true
-            docker rm my-django-app || true
-            docker run -d \
-              --name my-django-app \
-              --restart unless-stopped \
-              -p 8000:8000 \
-              -e SECRET_KEY="$SECRET_KEY" \
-              -e DEBUG="False" \
-              "$DOCKER_IMAGE"
-          EOF
+#  deploy-docker:
+#    needs: [test, security]
+#    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#
+#      - name: Войти в Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
+#
+#      # ─── СБОРКА ОБРАЗА ────────────────────────────────
+#      - name: Собрать и запушить образ
+#        run: |
+#          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }} .
+#          docker push ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }}
+#
+#      # ─── ЗАПУСК НА СЕРВЕРЕ ────────────────────────────
+#      - name: Настроить SSH для запуска контейнера
+#        uses: webfactory/ssh-agent@v0.8.1
+#        with:
+#          ssh-private-key: ${{ secrets.SSH_KEY }}
+#
+#
+#      - name: Обновить контейнер на сервере
+#        env:
+#          DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/my-django-app:${{ github.sha }}
+#          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+#          # Добавьте другие секреты, если нужно:
+#          # DATABASE_URL: ${{ secrets.DATABASE_URL }}
+#          # ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+#        run: |
+#          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }} << EOF
+#            docker stop my-django-app || true
+#            docker rm my-django-app || true
+#            docker run -d \
+#              --name my-django-app \
+#              --restart unless-stopped \
+#              -p 8000:8000 \
+#              -e SECRET_KEY="$SECRET_KEY" \
+#              -e DEBUG="False" \
+#              "$DOCKER_IMAGE"
+#          EOF
