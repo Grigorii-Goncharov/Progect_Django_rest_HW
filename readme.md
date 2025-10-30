@@ -160,20 +160,20 @@ J   WT-аутентификация: безопасный вход и управ
    docker start my-django-app
 
  **РАБОТА С DOCKER COMPOSE**
-   ```bash
-   Сборка образа на фоне(-d)
-   docker-compose up -d --build
+    ```bash
+     Сборка образа на фоне(-d)
+     docker-compose up -d --build
 
-   Остановка всех работающих контейнеров
-   docker-compose down
+     Остановка всех работающих контейнеров
+     docker-compose down
 
-   Просмотр логов и id всех контейнеров
-   docker-compose logs
-   docker-compose ps
+     Просмотр логов и id всех контейнеров
+     docker-compose logs
+     docker-compose ps
 
 
-7. **DOCKER**
-   ```bash
+6. **DOCKER**
+     ```bash
    1. Заходим в настройки проекта на GitHub и выберавем *Secrets and variables*
    2. Добавляем новый секрет по кнопке *New repository secret* 
    3. на сервере созддаем новый ключ для GitHub ACTIONS:
