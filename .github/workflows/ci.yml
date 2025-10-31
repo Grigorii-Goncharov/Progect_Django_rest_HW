@@ -226,7 +226,7 @@ jobs:
             poetry run python manage.py collectstatic --noinput
 
             # Перезапуск (systemd)
-            sudo apt install nginx
+            sudo apt install -y nginx
             sudo systemctl restart myapp.service
 
       # ─── АЛЬТЕРНАТИВА: деплой через pip ───────────────
