@@ -222,15 +222,17 @@ jobs:
 
       - name: Копировать код на сервер
         run: |
-          rsync -avz \
-            --exclude='.git/' \
-            --exclude='__pycache__/' \
-            --exclude='*.pyc' \
-            --exclude='.github/' \
-            --exclude='.env' \
-            --exclude='poetry.lock' \
-            --exclude='pyproject.toml' \
-            . ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }}:${{ secrets.DEPLOY_DIR }}
+#          rsync -avz \
+#            --exclude='.git/' \
+#            --exclude='__pycache__/' \
+#            --exclude='*.pyc' \
+#            --exclude='.github/' \
+#            --exclude='.env' \
+#            --exclude='poetry.lock' \
+#            --exclude='pyproject.toml' \
+#            . ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }}:${{ secrets.DEPLOY_DIR }}
+         cd ${{ secrets.DEPLOY_DIR }}
+         git pull
 
       - name: Запустить деплой на сервере (Poetry)
         run: |
