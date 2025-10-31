@@ -222,7 +222,8 @@ jobs:
 
       - name: Копировать код на сервер
         run: |
-           cd ${{ secrets.DEPLOY_DIR }}
+           ls
+           cd /home/test/${{ secrets.DEPLOY_DIR }}
            git pull
 
       - name: Запустить деплой на сервере (Poetry)
