@@ -225,9 +225,10 @@ jobs:
             poetry run python manage.py migrate --noinput
             poetry run python manage.py collectstatic --noinput
 
-            # Перезапуск (systemd)
-            sudo apt install -y nginx
-            sudo systemctl restart myapp.service
+
+
+            sudo docker compose down || true
+            sudo docker compose up - d --build
 
       # ─── АЛЬТЕРНАТИВА: деплой через pip ───────────────
       # - name: Деплой через pip (закомментирован)
