@@ -223,7 +223,7 @@ jobs:
       - name: Копировать код на сервер
         run: |
            ls
-           cd /home/test/${{ secrets.DEPLOY_DIR }}
+           cd /home/test/Progect_Django_rest_HW/
            git pull
 
       - name: Запустить деплой на сервере (Poetry)
