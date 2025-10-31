@@ -214,10 +214,6 @@ jobs:
             cd /home/test/Progect_Django_rest_HW/
             git pull
 
-      - name: Запустить деплой на сервере (Poetry)
-        run: |
-            cd ${{ secrets.DEPLOY_DIR }}
-
             # Установить Poetry, если нужно
             if ! command -v poetry &> /dev/null; then
               pip3 install poetry
