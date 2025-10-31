@@ -203,28 +203,16 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-#      - name: Настроить SSH
-#        uses: appleboy/ssh-action@v1.0.3
-#        with:
-#          host: ${{ secrets.SECRET_IP }}
-#          username: ${{ secrets.SSH_USER }}
-#          key: ${{ secrets.SSH_KEY }}
-      - name: 🔑 Настроить SSH
-          # Актуальная версия ДЛЯ ДЕПЛОЯ webfactory/ssh-agent@v0.9.0
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Настроить SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-
-      - name: Добавить сервер в known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
-
-      - name: Копировать код на сервер
-        run: |
-           ls
-           cd /home/test/Progect_Django_rest_HW/
-           git pull
+          host: ${{ secrets.SECRET_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            ls
+            cd /home/test/Progect_Django_rest_HW/
+            git pull
 
       - name: Запустить деплой на сервере (Poetry)
         run: |
