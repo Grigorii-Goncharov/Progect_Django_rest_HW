@@ -216,7 +216,7 @@ jobs:
 
             # Установить Poetry, если нужно
             if ! command -v poetry &> /dev/null; then
-              pip3 install poetry
+              sudo apt install poetry
               poetry config virtualenvs.in-project true
             fi
 
