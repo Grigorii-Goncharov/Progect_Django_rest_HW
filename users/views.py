@@ -1,4 +1,3 @@
-from django.template.context_processors import request
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics, status
@@ -8,7 +7,7 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
     get_object_or_404,
 )
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from education.models import Course
@@ -89,7 +88,7 @@ class UserSubscribeAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        # Лучше передавать data в body, а не в GET(используется при POST, PUT, PATCH с форматами: JSON, form-data, etc.)
+        # Лучше передавать data в body, а не в GET(используется при POST, PUT, PATCH с форматами: JSON, form-data, ...)
         # Передача числа курса в теле запроса(request - тело словарь(data), course_id - ключ)
         course_id = request.data.get("course_id")
 

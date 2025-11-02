@@ -116,6 +116,18 @@ else:
     }
 
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         "NAME": os.getenv("DB_NAME"),
+#         "USER": os.getenv("DB_USER"),
+#         "PASSWORD": os.getenv("DB_PASSWORD"),
+#         "HOST": os.getenv("DB_HOST"),  # "db" (имя сервиса docker-compose из .env)
+#         "PORT": os.getenv("DB_PORT"),
+#     }
+# }
+
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -134,7 +146,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 
@@ -142,8 +154,10 @@ USE_TZ = True
 
 
 STATIC_URL = "static/"
+# STATICFILES_DIRS = (BASE_DIR / "static",)
 
-STATICFILES_DIRS = (BASE_DIR / "static",)
+STATICFILES_DIRS = [BASE_DIR / "static"]  # исходники статики
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -192,8 +206,12 @@ if "test" in sys.argv:
 # CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
 # Настройки Celery для работы с докером:
-CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0') # Используем REDIS_URL из окружения
-CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0') # Используем REDIS_URL из окружения
+CELERY_BROKER_URL = os.getenv(
+    "REDIS_URL", "redis://localhost:6379/0"
+)  # Используем REDIS_URL из окружения
+CELERY_RESULT_BACKEND = os.getenv(
+    "REDIS_URL", "redis://localhost:6379/0"
+)  # Используем REDIS_URL из окружения
 
 
 # Используем eventlet на Windows
@@ -204,7 +222,7 @@ CELERY_WORKER_POOL_RESTARTS = True
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
-CELERY_TIMEZONE = "TIME_ZONE"
+CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 

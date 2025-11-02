@@ -160,19 +160,128 @@ J   WT-аутентификация: безопасный вход и управ
    docker start my-django-app
 
  **РАБОТА С DOCKER COMPOSE**
-   ```bash
-   Сборка образа на фоне(-d)
-   docker-compose up -d --build
+      ```bash
+     Сборка образа на фоне(-d)
+     docker-compose up -d --build
 
-   Остановка всех работающих контейнеров
-   docker-compose down
+     Остановка всех работающих контейнеров
+     docker-compose down
 
-   Просмотр логов и id всех контейнеров
-   docker-compose logs
-   docker-compose ps
+     Просмотр логов и id всех контейнеров
+     docker-compose logs
+     docker-compose ps
 
 
+6. **DOCKER**
+     ```bash
+   1. Заходим в настройки проекта на GitHub и выберавем *Secrets and variables*
+   2. Добавляем новый секрет по кнопке *New repository secret* 
+   3. на сервере созддаем новый ключ для GitHub ACTIONS:
+   ssh-keygen -t ed25519 -C "github-actions@your-repo" -f github_actions_key
+   и получите его из терминала
+   cat github_actions_key.pub
+   
+   # Перезагрузите сессию или выполните:
+   newgrp docker
+   
+7. ** Настройка CI/CD **
+  
+ЧАСТЬ 1. Подготовка удалённого сервера (Ubuntu 22.04)
 
+    1. Установите необходимые компоненты
+
+    Подключитесь к серверу по SSH и выполните:
+         sudo apt update && sudo apt upgrade -y
+
+    # Установка базовых утилит
+        sudo apt install -y git curl wget build-essential libpq-dev python3-dev
+
+    # Установка Docker и Docker Compose
+        sudo apt install -y docker.io docker-compose
+        sudo usermod -aG docker $USER  # Добавить текущего пользователя в группу docker
+   
+    2. Установите Poetry (опционально, но рекомендуется)
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+        source ~/.bashrc
+        poetry config virtualenvs.in-project true
+   
+    3. Создайте директорию проекта и перейдите в нее
+   
+       mkdir -p /home/test/Progect_Django_rest_HW
+       cd /home/test/Progect_Django_rest_HW
+   
+    4. Настройте .env файл (если используется)
+   
+       Создайте файл .env в корне проекта с переменными окружения:
+       nano .env
+   
+       Пример содержимого:
+       SECRET_KEY=ваш_секретный_ключ
+       DEBUG=False
+       ALLOWED_HOSTS=ваш_домен_или_IP
+
+       DB_NAME=postgres
+       DB_USER=postgres
+       DB_PASSWORD=postgres
+       DB_HOST=db  # ← имя сервиса в docker-compose.yml
+       DB_PORT=5432
+
+      REDIS_HOST=redis
+      REDIS_PORT=6379
+   
+    5. Подготовьте docker-compose.yml
+    6. Подготовьте Dockerfile
+   
+ЧАСТЬ 2. Настройка GitHub Secrets
+   
+    В репозитории на GitHub:
+    Перейдите в Settings → Secrets and variables → Actions
+    Добавьте следующие секреты:
+   
+         НАЗВАНИЕ         ЗНАЧЕНИЕ
+   
+         SECRET_IP        IP-адрес вашего сервера (например, 192.168.1.10)
+         SSH_USER         Имя пользователя на сервере (например, ubuntu)
+         SSH_KEY          Приватный SSH-ключ (содержимое ~/.ssh/id_rsa или отдельного ключа)
+   
+    Рекомендуется создать отдельный SSH-ключ только для деплоя:
+    ssh-keygen -t ed25519 -f ~/.ssh/github_deploy -C "github-deploy"
+    Публичный ключ (github_deploy.pub) добавьте в ~/.ssh/authorized_keys на сервере. 
+   
+ЧАСТЬ 3. Как запустить деплой
+    
+    1. Push в нужную ветку
+       Workflow запускается автоматически при:
+        а) git push в ветки: main, master, develop, feature/task8
+        б) Открытии Pull Request в main, master, develop
+              
+    2. Этапы выполнения
+     
+        Lint: проверка кода (flake8 + black)
+        Test: запуск тестов с PostgreSQL в контейнере
+        Security: проверка уязвимостей через safety
+        Deploy-SSH: если все прошло успешно — деплой на сервер
+        
+        ⚠️ Деплой выполняется только после успешного прохождения тестов (needs: test).
+        
+    3. Что делает шаг деплоя на сервере?
+        Подключается по SSH
+        Выполняет git pull в папке проекта
+        Устанавливает зависимости через Poetry
+        Применяет миграции
+        Собирает статику
+        Перезапускает контейнеры через docker compose up -d --build
+        
+    ✅ Проверка работы
+        После успешного деплоя:
+
+        Откройте в браузере: http://<ваш_IP>:8000
+        Проверьте логи контейнера:
+        sudo docker compose logs web
+
+
+**DOCKER**    
 ## Лицензия 
    Этот проект распространяется по лицензии MIT.
 
