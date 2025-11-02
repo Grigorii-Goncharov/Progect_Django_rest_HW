@@ -249,7 +249,8 @@ jobs:
   # ───────────────────────────────────────
   deploy-docker:
     needs: [test, security]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/task8'
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/feature_task8' - ветка на гитхаб должна быть без "/"
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
