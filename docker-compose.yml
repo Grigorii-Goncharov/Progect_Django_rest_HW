@@ -3,7 +3,8 @@ version: '3.12'
 services:
 # ПРОПИСЫВАЕМ DJANGO приложение
   web:
-    build: .
+    #build: . # Для сборка через github(поменяйте коммент на image, если надо с dockerhub)
+    image: ${DOCKER_IMAGE}:${IMAGE_TAG}
      #Подгрузка статики и запуск веб-сервера для приложения
     command: sh -c "python manage.py collectstatic --noinput 
              && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
@@ -24,6 +25,7 @@ services:
       # и файл .env попал в контейнер (через COPY или volumes).
       # прописан condition, так как есть хелвчек в этих контейнерах и сервис включится при условии
       # не только запуска, но и проверки здоровья контейнера (контейнер=0)
+    restart: allways
 
 
 # ПРОПИСЫВАЕМ Celery
@@ -68,6 +70,8 @@ services:
       timeout: 3s
       retries: 3
 
+    restart: allways
+
 # ПРОПИСЫВАЕМ ВЕБ СЕРВЕР
   nginx:
     image: nginx:alpine
@@ -80,6 +84,8 @@ services:
       - media_volume:/media
     depends_on:
       - web
+
+    restart: allways
 
 # ПРОПИСЫВАЕМ postgres(db это DB_HOST)
   db:
@@ -99,6 +105,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+    restart: allways
 
 # Перечисляем имена томов без параметров, которые участвует в работе
 volumes:
