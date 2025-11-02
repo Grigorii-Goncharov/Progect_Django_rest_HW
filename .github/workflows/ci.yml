@@ -249,7 +249,7 @@ jobs:
   # ───────────────────────────────────────
   deploy-docker:
     needs: [test, security]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/"feature/task8"'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/task8'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
